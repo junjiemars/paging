@@ -5,8 +5,13 @@
 
 (defn unique-rand-int [n r]
   (let [s (set (take n (repeatedly #(rand-int r))))]
-    (take n (concat s (set/difference (set (take n (range r)))
-                                      s)))))
+    (set (take n (concat s (set/difference
+                            (set (take n (range r)))
+                            s))))))
+
+(defn unique-rand-set [n r x]
+  (let [s (unique-rand-int r r)]
+    (set (take n (set/difference s x)))))
 
 (defn paging
   "c, requested numbers which less than or equal 10
@@ -49,11 +54,11 @@
     (println "#0Rc(K)=EMPTY")
     (paging c n p 10))
   (let [c (set (repeatedly 10 #(rand-int 32)))
-        n (set (unique-rand-int 10 32))
+        n (set (unique-rand-int 10 100))
         p0 []]
     (println "0#Rc(K)=N that (N <= 10)")
-    (let [n1 n
+    (let [n1 (unique-rand-set 10 100 n)
           p1 (paging c n p0 10)]
       (println "1#Rc(K)=N Page#1")
       (let [p2 (paging c n1 p1 10)]
-        (println "2#Rc(K)=N Page#2")))))
+        (println "<END>")))))
