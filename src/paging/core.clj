@@ -26,14 +26,14 @@
         (if (empty? p);the fist page
           (let [d0 (take (- s c-rc) (set/difference n c))
                 p0 {:c c
-                    :n {:i 0 :v n}
+                    :n {:i 0 :v [n]}
                     :r {:i 0 :v d0}}]
             (pprint p0)
             p0)
           (let [ps (:r p)
                 pn (:n p)
                 p0 {:c c
-                    :n {:i 0 :v n}
+                    :n {:i 0 :v (conj (:v (:n p)) n)}
                     :r {:i 0 :v #{}}}]
             (println ps)
             (println pn)
@@ -52,7 +52,8 @@
         n (set (unique-rand-int 10 32))
         p0 []]
     (println "0#Rc(K)=N that (N <= 10)")
-    (let [p1 (paging c n p0 10)]
+    (let [n1 n
+          p1 (paging c n p0 10)]
       (println "1#Rc(K)=N Page#1")
-      (let [p2 (paging c n p1 10)]
+      (let [p2 (paging c n1 p1 10)]
         (println "2#Rc(K)=N Page#2")))))
