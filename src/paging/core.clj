@@ -39,11 +39,30 @@
                                 (vec (set/difference n c d)))}}]
             (pprint p0)
             p0)
-          (let [
-                p0 {:c c 
-                    :n {:i 0 :v n}
-                    :r {:i 0 :v #{}}}]
-            (pprint p0)
+          (let [pri (:i (:r p))
+                prv (:v (:r p))
+                crv (count prv)
+                pni (:i (:n p))
+                pnv (:v (:n p))
+                p0 p]
+            (if (<= (+ 1 pri) crv)
+              (let [v (nth prv  pri)]
+                (if (< (count v) s)
+                  (let [n1 (unique-rand-int s 100 pnv)
+                        d1 (take (- s (count v)) n1)
+                        v1 (concat v d1)]
+                    (println "v:" v)
+                    (println "n1:" n1)
+                    (println "v1:" v1)
+                    (println "d1:" d1)
+                    (update-in p0 [:n :v] conj n1)
+                    (println "conj:" (conj (pop prv) v1))
+                    (assoc-in p0 [:r :v] (conj (pop prv)
+                                               (vector v1)))
+                    (pprint p0))
+                  (println "v eq s")))
+              (let [xyz 1]
+                (println "def")))
             p0))))))
 
 (defn -main
@@ -59,7 +78,7 @@
         p0 []]
     (println "0#Rc(K)=N that (N <= 10)")
     (let [n1 (unique-rand-int 10 100 n)
-          p1 (paging c n p0 10)]
+          p1 (update-in (paging c n p0 10) [:r :i] + 1)]
       (println "1#Rc(K)=N Page#1")
       (let [p2 (paging c n1 p1 10)]
         (println "<END>")))))
