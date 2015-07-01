@@ -43,27 +43,20 @@
                 prv (:v (:r p))
                 crv (count prv)
                 pni (:i (:n p))
-                pnv (:v (:n p))
-                p0 p]
+                pnv (:v (:n p))]
             (if (<= (+ 1 pri) crv)
               (let [v (nth prv  pri)]
                 (if (< (count v) s)
                   (let [n1 (unique-rand-int s 100 pnv)
                         d1 (take (- s (count v)) n1)
-                        v1 (concat v d1)]
-                    (println "v:" v)
-                    (println "n1:" n1)
-                    (println "v1:" v1)
-                    (println "d1:" d1)
-                    (update-in p0 [:n :v] conj n1)
-                    (println "conj:" (conj (pop prv) v1))
-                    (assoc-in p0 [:r :v] (conj (pop prv)
-                                               (vector v1)))
-                    (pprint p0))
-                  (println "v eq s")))
+                        v1 (concat v d1)
+                        p0 (assoc-in p [:r :v pri] v1)]
+                    (pprint p0)
+                    p0)
+                  (do (pprint p) p)))
               (let [xyz 1]
                 (println "def")))
-            p0))))))
+            p))))))
 
 (defn -main
   "I don't do a whole lot ... yet."
