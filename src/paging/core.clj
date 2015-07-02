@@ -10,8 +10,9 @@
                              (set (take n (range r)))
                              s))))))
   ([n r x]
-   (let [s (unique-rand-int r r)]
-     (set (take n (set/difference s x))))))
+   (let [s (unique-rand-int r r)
+         x1 (set (reduce concat x))]
+     (set (take n (set/difference s x1))))))
 
 (defn paging
   "c, requested numbers which less than or equal 10
@@ -32,7 +33,7 @@
         (if (empty? p);the fist page
           (let [d (take (- s c-rc) (set/difference n c))
                 p0 {:c c
-                    :n {:i 0 :v n}
+                    :n {:i 0 :v (vector n)}
                     :d d
                     :r {:i 0 :v
                         (vector (vec (concat c d))
@@ -45,16 +46,18 @@
                 pni (:i (:n p))
                 pnv (:v (:n p))]
             (if (<= (+ 1 pri) crv)
-              (let [v (nth prv  pri)]
+              (let [v (vec (nth prv  pri))]
                 (if (< (count v) s)
-                  (let [n1 (unique-rand-int s 100 pnv)
-                        d1 (take (- s (count v)) n1)
-                        v1 (concat v d1)
-                        p0 (assoc-in p [:r :v pri] v1)]
+                  (let [n0 (unique-rand-int s 100 (vector pnv))
+                        d1 (take (- s (count v)) n0)
+                        v1 (vec (concat v d1))
+                        pn (assoc-in p [:n :v (inc pni)] n0)
+                        p0 (assoc-in pn [:r :v pri] v1)]
                     (pprint p0)
                     p0)
                   (do (pprint p) p)))
-              (let [xyz 1]
+              (let [m (- (inc pri) crv)]
+                (println "xyz:" m)
                 (println "def")))
             p))))))
 
@@ -67,11 +70,13 @@
     (println "#0Rc(K)=EMPTY")
     (paging c n p 10))
   (let [c (set (repeatedly 10 #(rand-int 32)))
-        n (set (unique-rand-int 10 100))
+        n (unique-rand-int 10 100)
         p0 []]
     (println "0#Rc(K)=N that (N <= 10)")
-    (let [n1 (unique-rand-int 10 100 n)
+    (let [n1 (unique-rand-int 10 100 (vector n))
           p1 (update-in (paging c n p0 10) [:r :i] + 1)]
       (println "1#Rc(K)=N Page#1")
-      (let [p2 (paging c n1 p1 10)]
-        (println "<END>")))))
+      (let [p2 (update-in (paging c n1 p1 10) [:r :i] + 2)]
+        (println "2#Rc(K)=N")
+        (let [p3 (paging c n1 p2 10)]
+          (println "<END>"))))))
