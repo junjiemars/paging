@@ -4,6 +4,8 @@
 
 
 (defn unique-rand-int
+  "Returns n numbers of rand integers based on r, 
+  or be excluded by x."
   ([n r]
    (let [s (set (take n (repeatedly #(rand-int r))))]
      (set (take n (concat s (set/difference
@@ -14,7 +16,9 @@
          x1 (set (reduce concat x))]
      (set (take n (set/difference s x1))))))
 
-(defn unique-rand-pages [n r t f coll]
+(defn unique-rand-pages
+  "Returns [coll <news>], the <news> is uniqued against coll."
+  [n r t f coll]
   (loop [i 0
          c coll
          t0 []]
@@ -22,6 +26,23 @@
       (let [t1 (f (unique-rand-int n r c))]
         (recur (inc i) (conj c t1) (conj t0 t1)))
       (vector coll t0))))
+
+(defn pageup
+  "Return paging struct.
+   s: page size
+   r: requested struct
+   p: posted struct"
+  [s r p]
+  (let [r-ri (:i (:r r))
+        r-rv (:v (:r r))
+        r-rl (:l (:r r))
+        r-ni (:i (:n r))
+        ]
+    (if (< r-ri r-rl)
+      (assoc-in p [:r :i] r-ri)
+      (do
+        (println "abc")))
+    ))
 
 (defn paging
   "c, requested numbers which less than or equal 10
@@ -38,16 +59,17 @@
                 :r {:i 0 :v n}}]
         (pprint p0)
         p0)
-      (let [c-rc (count c)
-            c-rn (count n)]
+      (let [cc (count c)
+            cn (count n)]
         (if (empty? p);the fist page
-          (let [d (take (- s c-rc) (set/difference n c))
+          (let [d (take (- s cc) (set/difference n c))
                 p0 {:c c
                     :n {:i 0 :v (vector n)}
                     :d d
                     :r {:i 0 :v
-                        (vector (vec (concat c d))
-                                (vec (set/difference n c d)))}}]
+                        (vector
+                         (vec (concat c d))
+                         (vec (set/difference n c d)))}}]
             (pprint p0)
             p0)
           (let [pri (:i (:r p))
