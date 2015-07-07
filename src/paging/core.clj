@@ -27,21 +27,65 @@
         (recur (inc i) (conj c t1) (conj t0 t1)))
       (vector coll t0))))
 
+
+(defn paging0 [s c n i p]
+  (let [cc (count c)
+        cn (count n)
+        d (set/difference n c)
+        cd (count d)
+        i0 (- s cc)
+        p1 (loop [j 0
+                  v0 []]
+             (cond
+              (< j s)
+              (recur s (vec
+                        (concat (vec c) (take (- s cc) d))))
+
+              (< i0 cd)
+              (vector v0 (vec (take s (subvec (vec d) i0))))
+               :else v0))]
+    p1))
+
 (defn pageup
   "Return paging struct.
    s: page size
+   l: limit
+   t: total elements
    r: requested struct
    p: posted struct"
-  [s r p]
+  [s l t r p]
   (let [r-ri (:i (:r r))
         r-rv (:v (:r r))
         r-rl (:l (:r r))
         r-ni (:i (:n r))
         ]
-    (if (< r-ri r-rl)
-      (assoc-in p [:r :i] r-ri)
-      (do
-        (println "abc")))
+    (cond
+     (< r-ri r-rl)
+     (do
+       (assoc-in p [:r :i] r-ri))
+     
+     (= 0 (+ r-ri r-rl))
+     (let [c (:c r)
+           p0 (assoc-in p [:c] c)
+           n (unique-rand-int s l)
+           d (set/difference n (:c r))
+           n0 (assoc-in p0 [:n] {:i 0 :l 1 :v (vector n)})
+           r0 (assoc-in n0 [:r] {:i 0 :l 1})
+           v (concat c (take (- s (count c)) d))
+           rv0 (assoc-in r0 [:r :v] (vec v))]
+       (cond (= (count c) (count d))
+             (let [p1 (assoc-in rv0
+                                [:r :v]
+                                (vector (:v (:r rv0))
+                                        (vec d)))]
+               (update-in p1 [:r :l] + 1))
+
+         :else rv0))
+
+     :else
+     (let [p0 p]
+       (println "abc")
+       p0))
     ))
 
 (defn paging
@@ -100,6 +144,24 @@
                 
                 ))
             p))))))
+
+(defn -test
+  [& args]
+  (let [s 3
+        l 100
+        t 12]
+    (let [p0 (pageup s l t
+                     {:c (unique-rand-int (rand-int (inc s)) l)
+                      :n {:i 0 :l 0}
+                      :r {:i 0 :l 0}}
+                     {})
+          p1 (pageup s l t
+                     (update-in p0 [:r :i] + 1)
+                     p0)
+          ]
+      (println "<END>")
+      (pprint p0)
+      (pprint p1))))
 
 (defn -main
   "I don't do a whole lot ... yet."
