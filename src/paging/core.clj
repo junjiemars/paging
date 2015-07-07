@@ -63,9 +63,12 @@
 
          ni (:i (:n r))]
      (cond
-      (< ri rl) (assoc-in p [:r :i] ri)
+      (< ri (dec rl)) (let [p0 (assoc-in p [:r :i] ri)
+                         r0 (:v (:r p))
+                         p1 (assoc-in p0 [:p] (nth r0 ri))]
+                  p1)
 
-      (= 0 rc) (let [n0 (unique-rand-int s l)
+      (= 0 rc) (let [n0 (unique-rand-int (* s 2) l)
                      d0 (set/difference n0 c)
                      cd (count d0)
                      i0 (- s cc)
@@ -79,15 +82,19 @@
                                   {:i 0 :l 1 :t t
                                    :c (count n0)
                                    :v n0})]
-                 (if (and (> i0 0) (> cc 0))
-                   (pageup p3 p3 i0 d0)
-                   p3))
+                 (cond
+                  (and (> i0 0) (> cc 0)) (pageup p3 p3 i0 d0)
+                  :else p3)
+                 )
+
+      
+      
       :else p
       )))
 
   ([r p i d]
-   (let [d0 (subvec (vec d) i)
-         r0 (:r p)
+   (let [r0 (:r p)
+         d0 (subvec (vec d) i (+ i (:s (:s p))))
          p1 (assoc-in p [:r] {:i (:i r0)
                               :l (inc (:l r0))
                               :c (+ (:c r0) (count d0))
@@ -107,7 +114,8 @@
                               (rand-int (inc s)) l)
                           :d nil}
                       :n {:i 0 :l 0 :c 0}
-                      :r {:i 0 :l 0 :c 0}}
+                      :r {:i 0 :l 0 :c 0}
+                      :p nil}
                      {})
           p1 (pageup 
                      (update-in p0 [:r :i] + 1)
