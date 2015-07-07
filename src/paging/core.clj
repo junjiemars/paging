@@ -41,6 +41,14 @@
                :else v0))
 )
 
+(comment
+         p0 (assoc-in p [:r] {:i (inc (:i p))
+                              :l (inc (:l p))
+                              :v (vector (:v p) d0)
+                              :c (+ (:c (:c p))
+                                    (count d0))})
+)
+
 (defn pageup
   ([r p]
    (let [s (:s (:s r))
@@ -71,13 +79,20 @@
                                   {:i 0 :l 1 :t t
                                    :c (count n0)
                                    :v n0})]
-                 (pageup p3 p3 i0 d0))
+                 (if (and (> i0 0) (> cc 0))
+                   (pageup p3 p3 i0 d0)
+                   p3))
       :else p
       )))
 
   ([r p i d]
-   (let [d0 (vec d)]
-     (update-in p [:r :v] vector (subvec d0 i))))
+   (let [d0 (subvec (vec d) i)
+         r0 (:r p)
+         p1 (assoc-in p [:r] {:i (:i r0)
+                              :l (inc (:l r0))
+                              :c (+ (:c r0) (count d0))
+                              :v (vector (:v r0) d0)})]
+     p1))
   )
 
 (defn -main
