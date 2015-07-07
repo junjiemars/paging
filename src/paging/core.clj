@@ -27,14 +27,8 @@
         (recur (inc i) (conj c t1) (conj t0 t1)))
       (vector coll t0))))
 
-
-(defn paging0 [s c n i p]
-  (let [cc (count c)
-        cn (count n)
-        d (set/difference n c)
-        cd (count d)
-        i0 (- s cc)
-        p1 (loop [j 0
+(comment
+            p1 (loop [j 0
                   v0 []]
              (cond
               (< j s)
@@ -43,119 +37,64 @@
 
               (< i0 cd)
               (vector v0 (vec (take s (subvec (vec d) i0))))
-               :else v0))]
-    p1))
+              
+               :else v0))
+)
 
 (defn pageup
-  "Return paging struct.
-   s: page size
-   l: limit
-   t: total elements
-   r: requested struct
-   p: posted struct"
-  [s l t r p]
-  (let [r-ri (:i (:r r))
-        r-rv (:v (:r r))
-        r-rl (:l (:r r))
-        r-ni (:i (:n r))
-        ]
-    (cond
-     (< r-ri r-rl)
-     (do
-       (assoc-in p [:r :i] r-ri))
-     
-     (= 0 (+ r-ri r-rl))
-     (let [c (:c r)
-           p0 (assoc-in p [:c] c)
-           n (unique-rand-int s l)
-           d (set/difference n (:c r))
-           n0 (assoc-in p0 [:n] {:i 0 :l 1 :v (vector n)})
-           r0 (assoc-in n0 [:r] {:i 0 :l 1})
-           v (concat c (take (- s (count c)) d))
-           rv0 (assoc-in r0 [:r :v] (vec v))]
-       (cond (= (count c) (count d))
-             (let [p1 (assoc-in rv0
-                                [:r :v]
-                                (vector (:v (:r rv0))
-                                        (vec d)))]
-               (update-in p1 [:r :l] + 1))
+  ([r p]
+   (let [s (:s (:s r))
+         l (:l (:s r))
+         t (:t (:s r))
+         c (:c (:c r))
+         cc (count c)
 
-         :else rv0))
+         ri (:i (:r r))
+         rl (:l (:r r))
+         rc (:c (:r r))
 
-     :else
-     (let [p0 p]
-       (println "abc")
-       p0))
-    ))
+         ni (:i (:n r))]
+     (cond
+      (< ri rl) (assoc-in p [:r :i] ri)
 
-(defn paging
-  "c, requested numbers which less than or equal 10
-   n, requested numbers may be insected with c, S(c)<=S(n)
-   p, pointer to paging position
-   s, page size, default is 10
-   t, total numbers"
-  [c n p s]
-  (let [x 1]
-    (if (empty? c)
-      (let [p0 {:c c
-                :n {:i 0 :v n}
-                :d []
-                :r {:i 0 :v n}}]
-        (pprint p0)
-        p0)
-      (let [cc (count c)
-            cn (count n)]
-        (if (empty? p);the fist page
-          (let [d (take (- s cc) (set/difference n c))
-                p0 {:c c
-                    :n {:i 0 :v (vector n)}
-                    :d d
-                    :r {:i 0 :v
-                        (vector
-                         (vec (concat c d))
-                         (vec (set/difference n c d)))}}]
-            (pprint p0)
-            p0)
-          (let [pri (:i (:r p))
-                prv (:v (:r p))
-                crv (count prv)
-                pni (:i (:n p))
-                pnv (:v (:n p))]
-            (if (<= (+ 1 pri) crv)
-              (let [v (vec (nth prv pri))]
-                (if (< (count v) s)
-                  (let [n0 (unique-rand-int s 100 (vector pnv))
-                        d0 (take (- s (count v)) n0)
-                        v0 (vec (concat v d0))
-                        pnv0 (assoc-in p [:n :v (inc pni)] n0)
-                        pni0 (assoc-in pnv0 [:n :i] (inc pni))
-                        p0 (assoc-in pni0 [:r :v pri] v0)]
-                    (pprint p0)
-                    p0)
-                  (do (pprint p) p)))
-              (let [dr0 (- (inc pri) crv)
-                    dn0 (- (inc pri) (inc pni))
-                    n0 (unique-rand-pages s 100 dn0 set pnv)]
-                (println "dr0:" dr0)
-                (println "dn0:" dn0)
-                (println "pni:" pni)
-                (println "n0:" n0)
-                (println "n0-vec:" (map vec n0))
-                
-                ))
-            p))))))
+      (= 0 rc) (let [n0 (unique-rand-int s l)
+                     d0 (set/difference n0 c)
+                     cd (count d0)
+                     i0 (- s cc)
+                     v (concat (vec c) (take i0 d0))
+                     p0 r
+                     p1 (assoc-in p0 [:r]
+                                  {:i 0 :l 1 :c (count v)
+                                   :v (vec v)})
+                     p2 (assoc-in p1 [:c :d] d0)
+                     p3 (assoc-in p2 [:n]
+                                  {:i 0 :l 1 :t t
+                                   :c (count n0)
+                                   :v n0})]
+                 (pageup p3 p3 i0 d0))
+      :else p
+      )))
 
-(defn -test
+  ([r p i d]
+   (let [d0 (vec d)]
+     (update-in p [:r :v] vector (subvec d0 i))))
+  )
+
+(defn -main
+  "I don't do a whole lot ... yet."
   [& args]
   (let [s 3
         l 100
         t 12]
-    (let [p0 (pageup s l t
-                     {:c (unique-rand-int (rand-int (inc s)) l)
-                      :n {:i 0 :l 0}
-                      :r {:i 0 :l 0}}
+    (let [p0 (pageup 
+                     {:s {:s s :l l :t t};paging constants
+                      :c {:c (unique-rand-int
+                              (rand-int (inc s)) l)
+                          :d nil}
+                      :n {:i 0 :l 0 :c 0}
+                      :r {:i 0 :l 0 :c 0}}
                      {})
-          p1 (pageup s l t
+          p1 (pageup 
                      (update-in p0 [:r :i] + 1)
                      p0)
           ]
@@ -163,22 +102,3 @@
       (pprint p0)
       (pprint p1))))
 
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (let [c []
-        n []
-        p []]
-    (println "#0Rc(K)=EMPTY")
-    (paging c n p 10))
-  (let [c (set (repeatedly 10 #(rand-int 32)))
-        n (unique-rand-int 10 100)
-        p0 []]
-    (println "0#Rc(K)=N that (N <= 10)")
-    (let [n1 (unique-rand-int 10 100 (vector n))
-          p1 (update-in (paging c n p0 10) [:r :i] + 1)]
-      (println "1#Rc(K)=N Page#1")
-      (let [p2 (update-in (paging c n1 p1 10) [:r :i] + 2)]
-        (println "2#Rc(K)=N Page#1+2")
-        (let [p3 (paging c n1 p2 10)]
-          (println "<END>"))))))
