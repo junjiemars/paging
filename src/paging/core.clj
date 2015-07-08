@@ -28,28 +28,6 @@
         (recur (inc i) (conj c t1) (conj t0 t1)))
       (vector coll t0))))
 
-(comment
-            p1 (loop [j 0
-                  v0 []]
-             (cond
-              (< j s)
-              (recur s (vec
-                        (concat (vec c) (take (- s cc) d))))
-
-              (< i0 cd)
-              (vector v0 (vec (take s (subvec (vec d) i0))))
-              
-               :else v0))
-)
-
-(comment
-         p0 (assoc-in p [:r] {:i (inc (:i p))
-                              :l (inc (:l p))
-                              :v (vector (:v p) d0)
-                              :c (+ (:c (:c p))
-                                    (count d0))})
-)
-
 (defn pageup
   ([r p]
    (let [s (:s (:s r))
