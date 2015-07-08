@@ -62,33 +62,56 @@
          rl (:l (:r r))
          rc (:c (:r r))
 
-         ni (:i (:n r))]
+         ni (:i (:n r))
+         nc (:c (:n r))
+         nv (:v (:n p))]
      (cond
       (< ri (dec rl)) (let [p0 (assoc-in p [:r :i] ri)
                             r0 (:v (:r p))
                             p1 (assoc-in p0 [:p] (nth r0 ri))]
                         p1)
 
-      (= 0 rc) (let [n0 (unique-rand-int (* s 2) l)
-                     d0 (set/difference n0 c)
-                     cd (count d0)
-                     i0 (- s cc)
-                     v (concat (vec c) (take i0 d0))
-                     p0 r
-                     p1 (assoc-in p0 [:r]
-                                  {:i 0 :l 1 :c (count v)
-                                   :v (vec v)})
-                     p2 (assoc-in p1 [:c :d] d0)
-                     p3 (assoc-in p2 [:n]
-                                  {:i 0 :l 1 :t t
-                                   :c (count n0)
-                                   :v n0})]
-                 (cond
-                  (and (> i0 0) (> cc 0)) (pageup p3 p3 i0 d0)
-                  :else p3)
-                 )
+      (= 0 rc)
+      (let [n0 (unique-rand-int s l)
+            d0 (set/difference n0 c)
+            cd (count d0)
+            i0 (- s cc)
+            v (concat (vec c) (take i0 d0))
+            p0 r
+            p1 (assoc-in p0 [:r]
+                         {:i 0 :l 1 :c (count v)
+                          :v (vec v)})
+            p2 (assoc-in p1 [:c :d] d0)
+            p3 (assoc-in p2 [:n]
+                         {:i 0 :l 1 :t t
+                          :c (count n0)
+                          :v (vector n0)})]
+        (cond
+         (and (> i0 0) (< i0 s)) 
+         (pageup p3 p3 i0 d0)
 
-      
+         (= s cc) (pageup p3 p3 0 d0)
+
+         :else p3)
+        )
+
+      (>= ri (dec rl))
+      (let [l0 (inc (- ri (dec rl)))
+            n0 (unique-rand-int (* 2 s l0) l nv)
+            d0 (set/difference n0 c)
+            cd (count d0)
+            v (nth (:v (:r p)) (dec rl))
+            i0 (- s (count v))
+            v0 (concat v (take i0 d0))]
+        (cond
+         
+         
+         :else
+         (do (printf "#l0:%d n0:%s d0:%s v:%s\n"
+                     l0 n0 d0 v)
+             (println v0)
+             p)
+         ))
       
       :else p
       )))
@@ -126,8 +149,10 @@
           p1 (pageup 
                      (update-in p0 [:r :i] + 1)
                      p0)
-          ]
+
+          p2 (pageup (update-in p1 [:r :i] + 1) p1)]
       (println "<END>")
       (pprint p0)
-      (pprint p1))))
+      (pprint p1)
+      (pprint p2))))
 
