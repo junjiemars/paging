@@ -1,5 +1,6 @@
 (ns paging.core
   (require [clojure.set :as set])
+  (use [clojure.tools.trace])
   (:gen-class))
 
 
@@ -64,9 +65,9 @@
          ni (:i (:n r))]
      (cond
       (< ri (dec rl)) (let [p0 (assoc-in p [:r :i] ri)
-                         r0 (:v (:r p))
-                         p1 (assoc-in p0 [:p] (nth r0 ri))]
-                  p1)
+                            r0 (:v (:r p))
+                            p1 (assoc-in p0 [:p] (nth r0 ri))]
+                        p1)
 
       (= 0 rc) (let [n0 (unique-rand-int (* s 2) l)
                      d0 (set/difference n0 c)
@@ -94,13 +95,18 @@
 
   ([r p i d]
    (let [r0 (:r p)
-         d0 (subvec (vec d) i (+ i (:s (:s p))))
+         s (:s (:s p))
+         i0 (+ i (min s (- (count d) i)))
+         d0 (subvec (vec d) i i0)
          p1 (assoc-in p [:r] {:i (:i r0)
                               :l (inc (:l r0))
                               :c (+ (:c r0) (count d0))
                               :v (vector (:v r0) d0)})]
-     p1))
-  )
+     (if (< i0 (dec (count d)))
+       (pageup p1 p1 i0 d)
+       p1))
+   )
+)
 
 (defn -main
   "I don't do a whole lot ... yet."
