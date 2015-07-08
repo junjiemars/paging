@@ -58,7 +58,8 @@
             p0 r
             p1 (assoc-in p0 [:r]
                          {:i 0 :l 1 :c (count v)
-                          :v (vec v)})
+                          :v (if (empty? c)
+                               (vector (vec v)) (vec v))})
             p2 (assoc-in p1 [:c :d] d0)
             p3 (assoc-in p2 [:n]
                          {:i 0 :l 1 :t t
@@ -73,21 +74,23 @@
          :else p3)
         )
 
-      (>= ri (dec rl))
+      (> ri (dec rl))
       (let [l0 (inc (- ri (dec rl)))
             n0 (unique-rand-int (* 2 s l0) l nv)
             d0 (set/difference n0 c)
             cd (count d0)
-            v (nth (:v (:r p)) (dec rl))
-            i0 (- s (count v))
-            v0 (concat v (take i0 d0))]
+            v (peek (:v (:r p)))
+            vc (count v)
+            i0 (- s vc)]
         (cond
-         
+         (= s vc)
+         (let [v0 (concat v (take i0 d0))]
+           (printf "##v0:%s\n" (seq v0))
+           p)
          
          :else
          (do (printf "#l0:%d n0:%s d0:%s v:%s\n"
                      l0 n0 d0 v)
-             (println v0)
              p)
          ))
       
@@ -130,7 +133,16 @@
 
           p2 (pageup (update-in p1 [:r :i] + 1) p1)]
       (println "<END>")
-      (pprint p0)
-      (pprint p1)
-      (pprint p2))))
+      (let [i (:i (:r p0))
+            v (:v (:r p0))]
+        (pprint p0)
+        (pprint (nth v i)))
+      (let [i (:i (:r p1))
+            v (:v (:r p1))]
+        (pprint p1)
+        (pprint (nth v i)))
+      (let [i (:i (:r p2))
+            v (:v (:r p2))]
+        (pprint p2)
+        (pprint (nth v i))))))
 
