@@ -43,11 +43,18 @@
          ni (:i (:n r))
          nc (:c (:n r))
          nv (:v (:n p))]
+
+     (comment
+       (println "####")
+       (pprint r)
+       (pprint p))
+
      (cond
-      (< ri (dec rl)) (let [p0 (assoc-in p [:r :i] ri)
-                            r0 (:v (:r p))
-                            p1 (assoc-in p0 [:p] (nth r0 ri))]
-                        p1)
+      (or (< ri (dec rl)) (and (= ri (dec rl)) (= rc (* s rl))))
+      (let [p0 (assoc-in p [:r :i] ri)
+            r0 (:v (:r p))
+            p1 (assoc-in p0 [:p] (nth r0 ri))]
+        p1)
 
       (= 0 rc)
       (let [n0 (unique-rand-int s l)
@@ -87,6 +94,11 @@
          (let [v0 (concat v (take i0 d0))]
            (printf "##v0:%s\n" (seq v0))
            p)
+
+         (< vc s)
+         (let [v0 (concat v (take i0 d0))]
+           (printf "###v0:s\n" (seq v0))
+           (update-in p [:r :i] + 1))
          
          :else
          (do (printf "#l0:%d n0:%s d0:%s v:%s\n"
@@ -106,6 +118,11 @@
                               :l (inc (:l r0))
                               :c (+ (:c r0) (count d0))
                               :v (vector (:v r0) d0)})]
+     (comment
+       (println "----")
+       (pprint r)
+       (pprint p))
+     
      (if (< i0 (dec (count d)))
        (pageup p1 p1 i0 d)
        p1))
@@ -127,22 +144,40 @@
                       :r {:i 0 :l 0 :c 0}
                       :p nil}
                      {})
-          p1 (pageup 
-                     (update-in p0 [:r :i] + 1)
-                     p0)
 
-          p2 (pageup (update-in p1 [:r :i] + 1) p1)]
+          p1 (pageup 
+                (update-in p0 [:r :i] + 1)
+                p0)
+
+          ]
       (println "<END>")
+      
       (let [i (:i (:r p0))
             v (:v (:r p0))]
         (pprint p0)
         (pprint (nth v i)))
-      (let [i (:i (:r p1))
-            v (:v (:r p1))]
-        (pprint p1)
-        (pprint (nth v i)))
-      (let [i (:i (:r p2))
-            v (:v (:r p2))]
-        (pprint p2)
-        (pprint (nth v i))))))
+      
 
+      (let [i (:i (:r p1))
+              v (:v (:r p1))]
+          (pprint p1)
+          (pprint (nth v i)))
+
+)))
+
+          (comment
+            p1 (pageup 
+                (update-in p0 [:r :i] + 1)
+                p0)
+
+            p2 (pageup (update-in p1 [:r :i] + 1) p1))
+
+      (comment
+        (let [i (:i (:r p1))
+              v (:v (:r p1))]
+          (pprint p1)
+          (pprint (nth v i)))
+        (let [i (:i (:r p2))
+              v (:v (:r p2))]
+          (pprint p2)
+          (pprint (nth v i))))
