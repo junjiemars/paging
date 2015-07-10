@@ -39,6 +39,7 @@
          ri (:i (:r r))
          rl (:l (:r r))
          rc (:c (:r r))
+         rv (:v (:r r))
 
          ni (:i (:n r))
          nc (:c (:n r))
@@ -50,7 +51,8 @@
        (pprint p))
 
      (cond
-      (or (< ri (dec rl)) (and (= ri (dec rl)) (= rc (* s rl))))
+      (or (< ri (dec rl))
+          (and (= ri (dec rl)) (= rc (* s rl))))
       (let [p0 (assoc-in p [:r :i] ri)
             r0 (:v (:r p))
             p1 (assoc-in p0 [:p] (nth r0 ri))]
@@ -81,24 +83,24 @@
          :else p3)
         )
 
-      (> ri (dec rl))
+      (>= ri (dec rl))
       (let [l0 (inc (- ri (dec rl)))
             n0 (unique-rand-int (* 2 s l0) l nv)
             d0 (set/difference n0 c)
             cd (count d0)
-            v (peek (:v (:r p)))
+            v (peek rv)
             vc (count v)
             i0 (- s vc)]
         (cond
-         (= s vc)
-         (let [v0 (concat v (take i0 d0))]
-           (printf "##v0:%s\n" (seq v0))
-           p)
-
          (< vc s)
-         (let [v0 (concat v (take i0 d0))]
-           (printf "###v0:s\n" (seq v0))
-           (update-in p [:r :i] + 1))
+         (let [v0 (concat v (take i0 d0))
+               p0 (assoc-in p [:r]
+                            {:i ri
+                             :c (+ rc s)
+                             :l (inc rl)
+                             :v (conj (pop rv) (vec v0))})]
+           (printf "###v0:%s\n" (seq v0))
+           p0)
          
          :else
          (do (printf "#l0:%d n0:%s d0:%s v:%s\n"
