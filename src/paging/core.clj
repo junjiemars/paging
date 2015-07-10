@@ -42,13 +42,9 @@
          rv (:v (:r r))
 
          ni (:i (:n r))
+         nl (:l (:n r))
          nc (:c (:n r))
          nv (:v (:n p))]
-
-     (comment
-       (println "####")
-       (pprint r)
-       (pprint p))
 
      (cond
       (or (< ri (dec rl))
@@ -89,7 +85,8 @@
 
       (>= ri (dec rl))
       (let [l0 (inc (- ri (dec rl)))
-            n0 (unique-rand-int (* 2 s l0) l nv)
+            s2 (* 2 s l0)
+            n0 (unique-rand-int s2 l nv)
             d0 (set/difference n0 c)
             cd (count d0)
             v (peek rv)
@@ -98,12 +95,19 @@
         (cond
          (< vc s)
          (let [v0 (concat v (take i0 d0))
+               v1 (conj (pop rv) (vec v0))
                p0 (assoc-in p [:r]
                             {:i ri
-                             :c (+ rc s)
-                             :l (inc rl)
-                             :v (conj (pop rv) (vec v0))})]
-           (pageup p0 p0 i0 d0))
+                             :c (- (+ rc s) vc)
+                             :l (dec (inc rl))
+                             :v v1})
+               p1 (assoc-in p0 [:c :d] d0)
+               p2 (assoc-in p1 [:n]
+                            {:i (+ ni 2)
+                             :l (+ nl 2)
+                             :c (+ nc s2)
+                             :v (conj nv d0)})]
+           (pageup p1 p1 i0 d0))
          
          :else
          (do (printf "#l0:%d n0:%s d0:%s v:%s\n"
@@ -123,10 +127,6 @@
                               :l (inc (:l r0))
                               :c (+ (:c r0) (count d0))
                               :v (conj (:v r0) d0)})]
-     (comment
-       (println "----")
-       (pprint r)
-       (pprint p))
      
      (if (< i0 (dec (count d)))
        (pageup p1 p1 i0 d)
