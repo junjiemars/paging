@@ -67,8 +67,8 @@
             p0 r
             p1 (assoc-in p0 [:r]
                          {:i 0 :l 1 :c (count v)
-                          :v (if (empty? c)
-                               (vector (vec v)) (vec v))})
+                          :v (vector (vec v))})
+            
             p2 (assoc-in p1 [:c :d] d0)
             p3 (assoc-in p2 [:n]
                          {:i 0 :l 1 :t t
@@ -76,9 +76,13 @@
                           :v (vector n0)})]
         (cond
          (and (> i0 0) (< i0 s)) 
-         (pageup p3 p3 i0 d0)
+         (do
+           (pageup p3 p3 i0 d0))
 
-         (= s cc) (pageup p3 p3 0 d0)
+         (= s cc)
+         (do
+           (printf "#!v:%s\n" v)
+           (pageup p3 p3 0 d0))
 
          :else p3)
         )
@@ -99,8 +103,7 @@
                              :c (+ rc s)
                              :l (inc rl)
                              :v (conj (pop rv) (vec v0))})]
-           (printf "###v0:%s\n" (seq v0))
-           p0)
+           (pageup p0 p0 i0 d0))
          
          :else
          (do (printf "#l0:%d n0:%s d0:%s v:%s\n"
@@ -119,7 +122,7 @@
          p1 (assoc-in p [:r] {:i (:i r0)
                               :l (inc (:l r0))
                               :c (+ (:c r0) (count d0))
-                              :v (vector (:v r0) d0)})]
+                              :v (conj (:v r0) d0)})]
      (comment
        (println "----")
        (pprint r)
