@@ -6,7 +6,7 @@
 
 (defn unique-rand-int
   "Returns n numbers of rand integers based on r, 
-  or be excluded by x."
+   or be excluded by x."
   ([n r]
    (let [s (set (take n (repeatedly #(rand-int r))))]
      (set (take n (concat s (set/difference
@@ -67,7 +67,7 @@
             
             p2 (assoc-in p1 [:c :d] d0)
             p3 (assoc-in p2 [:n]
-                         {:i 0 :l 1 :t t
+                         {:i 0 :l 1
                           :c (count n0)
                           :v (vector n0)})]
         (cond
@@ -77,7 +77,6 @@
 
          (= s cc)
          (do
-           (printf "#!v:%s\n" v)
            (pageup p3 p3 0 d0))
 
          :else p3)
@@ -106,8 +105,11 @@
                             {:i (+ ni 2)
                              :l (+ nl 2)
                              :c (+ nc s2)
-                             :v (conj nv d0)})]
-           (pageup p1 p1 i0 d0))
+                             :v (vec
+                                 (concat nv
+                                         (map set
+                                              (partition s n0))))})]
+           (pageup p2 p2 i0 d0))
          
          :else
          (do (printf "#l0:%d n0:%s d0:%s v:%s\n"
@@ -138,21 +140,21 @@
   "I don't do a whole lot ... yet."
   [& args]
   (let [s 3
-        l 100
+        l 100 ;removed in Pro env
         t 12]
     (let [p0 (pageup 
-                     {:s {:s s :l l :t t};paging constants
+                     {:s {:s s :l l :t t}
                       :c {:c (unique-rand-int
                               (rand-int (inc s)) l)
                           :d nil}
                       :n {:i 0 :l 0 :c 0}
                       :r {:i 0 :l 0 :c 0}
                       :p nil}
-                     {})
+                     {}) 
 
           p1 (pageup 
-                (update-in p0 [:r :i] + 1)
-                p0)
+                (update-in p0 [:r :i] + 1) 
+                p0) 
 
           ]
       (println "<END>")
