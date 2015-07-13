@@ -84,13 +84,14 @@
 
       (>= ri (dec rl))
       (let [l0 (inc (- ri (dec rl)))
-            s2 (* 2 s l0)
+            s2 (* s l0)
             n0 (unique-rand-int s2 l nv)
             d0 (set/difference n0 c)
             cd (count d0)
             v (peek rv)
             vc (count v)
             i0 (- s vc)]
+        (printf "##(>= ri (dec rl)):%s\n" v)
         (cond
          (< vc s)
          (let [v0 (concat v (take i0 d0))
@@ -110,6 +111,25 @@
                                          (map set
                                               (partition s n0))))})]
            (pageup p2 p2 i0 d0))
+
+         (= vc s)
+         (let [v0 (vec (take s d0))
+               v1 (conj rv v0)
+               p0 (assoc-in p [:c :d] d0)
+               p1 (assoc-in p0 [:r]
+                            {:i rl
+                             :c (+ rc s)
+                             :l (inc rl)
+                             :v v1})
+               p2 (assoc-in p1 [:n]
+                            {:i (+ ni l0)
+                             :l (+ nl l0)
+                             :c (+ nc s2)
+                             :v (vec
+                                 (concat nv
+                                         (map set
+                                              (partition s n0))))})]
+           (pageup p2 p2 s d0))
          
          :else
          (do (printf "#l0:%d n0:%s d0:%s v:%s\n"
@@ -152,9 +172,9 @@
                       :p nil}
                      {}) 
 
-          p1 (pageup 
-                (update-in p0 [:r :i] + 1) 
-                p0) 
+          p1 (pageup (update-in p0 [:r :i] + 1) p0)
+
+          p2 (pageup (update-in p1 [:r :i] + 2) p1)
 
           ]
       (println "<END>")
@@ -166,9 +186,14 @@
       
 
       (let [i (:i (:r p1))
-              v (:v (:r p1))]
+            v (:v (:r p1))]
           (pprint p1)
           (pprint (nth v i)))
+
+      (let [i (:i (:r p2))
+            v (:v (:r p2))]
+        (pprint p2)
+        (pprint (nth v i)))
 
 )))
 
@@ -188,3 +213,15 @@
               v (:v (:r p2))]
           (pprint p2)
           (pprint (nth v i))))
+
+(comment
+           (= vc s)
+         (let [v0 (vec (take i0 d0))
+               p0 (assoc-in p [:c :d] d0)
+               p1 (assoc-in p0 [:r]
+                            {:i ri
+                             :c (+ rc s)
+                             :l (inc rl)
+                             :v (concat rv v0)})]
+           (pageup p1 p1 (+ i0 s) d0))
+)
