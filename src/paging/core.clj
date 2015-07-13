@@ -91,7 +91,6 @@
             v (peek rv)
             vc (count v)
             i0 (- s vc)]
-        (printf "##(>= ri (dec rl)):%s\n" v)
         (cond
          (< vc s)
          (let [v0 (concat v (take i0 d0))
@@ -103,8 +102,8 @@
                              :v v1})
                p1 (assoc-in p0 [:c :d] d0)
                p2 (assoc-in p1 [:n]
-                            {:i (+ ni 2)
-                             :l (+ nl 2)
+                            {:i (+ ni l0)
+                             :l (+ nl l0)
                              :c (+ nc s2)
                              :v (vec
                                  (concat nv
