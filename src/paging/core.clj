@@ -149,7 +149,7 @@
                               :c (+ (:c r0) (count d0))
                               :v (conj (:v r0) d0)})]
      
-     (if (< i0 (dec (count d)))
+     (if (<= i0 (dec (count d)))
        (pageup p1 p1 i0 d)
        p1))
    )
