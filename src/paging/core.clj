@@ -1,10 +1,11 @@
 (ns paging.core
   (require [clojure.set :as set])
-  (use [clojure.tools.trace])
+  (use [clojure.pprint])
+  ;(use [clojure.tools.trace])
   (:gen-class))
 
 
-(defn unique-rand-int
+(defn ^:export unique-rand-int
   "Returns n numbers of rand integers based on r, 
    or be excluded by x."
   ([n r]
@@ -17,7 +18,7 @@
          x1 (set (reduce concat x))]
      (set (take n (set/difference s x1))))))
 
-(defn unique-rand-pages
+(defn ^:export unique-rand-pages
   "Returns [coll <news>], the <news> is uniqued against coll."
   [n r t f coll]
   (loop [i 0
@@ -28,7 +29,7 @@
         (recur (inc i) (conj c t1) (conj t0 t1)))
       (vector coll t0))))
 
-(defn pageup
+(defn ^:export pageup
   ([r p]
    (let [s (:s (:s r))
          l (:l (:s r))
@@ -89,7 +90,8 @@
         )
 
       (>= ri (dec rl))
-      (let [l0 (inc (- ri (dec rl)))
+      (let [
+            l0 (inc (- ri (dec rl)))
             s2 (* s l0)
             n0 (unique-rand-int s2 l nv)
             d0 (set/difference n0 c)
@@ -137,10 +139,7 @@
                                               (partition s n0))))})]
            (pageup p2 p2 s d0))
          
-         :else
-         (do 
-             p)
-         ))
+         :else p))
       
       :else p
       )))
@@ -161,7 +160,7 @@
    )
 )
 
-(defn -main
+(defn ^:export main
   "I don't do a whole lot ... yet."
   [& args]
   (let [s 3
@@ -180,7 +179,7 @@
 
           p1 (pageup (update-in p0 [:r :i] + 1) p0)
 
-          p2 (pageup (update-in p1 [:r :i] + 2) p1)
+          p2 (pageup (update-in p1 [:r :i] + 3) p1)
 
           ]
       (println "<END>")
